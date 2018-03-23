@@ -45,6 +45,7 @@
 
 %%% Custom headers/footers (fancyhdr package)
 \usepackage{fancyhdr}
+\usepackage{listings}
 \pagestyle{fancyplain}
 \fancyhead{}											% No page header
 \fancyfoot[L]{}											% Empty 
@@ -65,126 +66,217 @@
 \newcommand{\horrule}[1]{\rule{\linewidth}{#1}} 	% Horizontal rule
 
 \title{
-		%\vspace{-1in} 	
-		\usefont{OT1}{bch}{b}{n}
-		\normalfont \normalsize \textsc{University of Illinois at Urbana-Champaign} \\ [25pt]
-		\horrule{0.5pt} \\[0.4cm]
-		\huge Assignment 3 - Report \\
-		\horrule{2pt} \\[0.5cm]
+	%\vspace{-1in} 	
+	\usefont{OT1}{bch}{b}{n}
+	\normalfont \normalsize \textsc{University of Illinois at Urbana-Champaign} \\ [25pt]
+	\horrule{0.5pt} \\[0.4cm]
+	\huge Assignment 3 - Report \\
+	\horrule{2pt} \\[0.5cm]
 }
 \author{
-		\normalfont 								\normalsize
-        Department of Industrial and Enterprise Systems Engineering\\
-        \normalsize Zhenye Na (zna2)\\[-3pt]		\normalsize
-        \today
+	\normalfont 								\normalsize
+	Department of Industrial and Enterprise Systems Engineering\\
+	\normalsize Zhenye Na (zna2)\\[-3pt]		\normalsize
+	\today
 }
 \date{}
 
 
 %%% Begin document
 \begin{document}
-\maketitle
-
-\section{Single-Relation Queries (30 pts)}
-
-\begin{enumerate}
-	\item Consider the following relation:\\
-    Graph(n1 , n2)\\
-	A tuple (n1, n2) in Graph stores a directed edge from a node n1 to a node n2 in the corresponding graph. Your goal is to, for \textit{every} node in the graph, count the number of outgoing edges of that node. Note that for nodes without any outgoing edges, their edge count would be zero; you need to output this as well.
-You can assume that:
-\begin{enumerate}
-\item there are no duplicates or null values in the table; and
-\item every node in the graph is involved in at least one edge.
-\end{enumerate}
-
-\textbf{Solution: }
-    
-	\item Consider the following relation:\\
-    Trained(\underline{student}, master, year)\\
-    A tuple (S, M, Y) in Trained specifies that a SQL Master M trained student S who graduated in year Y. Your goal is to find \textit{the count of} SQL Masters who trained a student who graduated in the same year that 'Alice' or 'Bob' graduated.\\
-    \textbf{Solution: }
-
-
-
-	\item Consider the following relation:\\
-    DBMS(\underline{operator}, system, performance)\\
-    A tuple (O, S, P) in DBMS specifies an operator O in system S and has the performance value P. Your goal is to find those systems whose operators achieves a higher performance value on average than the average performance value in a system named 'PostgreSQL'.\\
-    \textbf{Solution: }
-    
-\end{enumerate}
-
-
-\section{Multi-Relation Queries (20 pts)}
-Consider the following relations representing student information at UIUC:\\
-Mentorship(\underline{mentee\_sid}, mentor\_sid)\\
-Study(\underline{sid}, credits)\\
-Enrollment(\underline{did}, sid)\\
-Student(\underline{sid}, street , city)
-
-\begin{itemize}
-\item A tuple (M1, M2) in Mentorship specifies that M2 is a mentor of another student M1. 
-\item A tuple (S, C) in Study specifies that the student S has taken C credits.
-\item A tuple in Enrollment (D, S) specifies that student S is enrolled in department D. 
-\item A (ST, S, C) in Student specifies that student ST lives on street S in city C.
-\end{itemize}
-
-\begin{enumerate}
-\item Find all students who live in the same city and on the same street as their mentor.
-\item Find all students(sid) who have taken more credits than the average credits of all of the students of their department.
-\end{enumerate}
-
-
-\textbf{Solution: }
-
-
-
-
-
-\section{Database Manipulation and Views (25 pts)}
-
-\begin{enumerate}
-\item In the Study relation, insert a new student, whose id is 66666 and has 0 credits.\\
-\textbf{Solution: }
-
-
-\item In the Study relation, delete students who have graduated (i.e., the ones who have more than 200 credits).\\
-\textbf{Solution: }
-
-
-\item In the Study relation, add 2 credits for students who are mentors.\\
-\textbf{Solution: }
-
-
-\item Incoming students are those who have been accepted (i.e., exist in the Student relation) but have not registered in any department (i.e., do not exist in the Enrollment relation). Create a View that contains sid of all incoming students.\\
-\textbf{Solution: }
-
-\end{enumerate}
-
-
-
-
-
-
-
-\section{Constraints and Triggers (25 pts)}
-\begin{enumerate}
-\item Consider the following relation: \\
-Payment(salary , bonus) \\
-Write a schema-level assertion using the "CREATE ASSERTION" statement to ensure that no bonus is larger than the maximum salary in the Payment relation.\\
-\textbf{Solution: }
-
-
-\item Consider the following relation: \\
-Study(\underline{sid}, major , GPA) \\
-Write a trigger T1 that increases the GPA by 10\% for those students who transform their major from any Non-CS major to 'CS'.\\
-\textbf{Solution: }
-
-
-\end{enumerate}
-
-
-
-
-
-%%% End document
+	\maketitle
+	
+	\section{Single-Relation Queries (30 pts)}
+	
+	\begin{enumerate}
+		\item Consider the following relation:\\
+		Graph(n1 , n2)\\
+		A tuple (n1, n2) in Graph stores a directed edge from a node n1 to a node n2 in the corresponding graph. Your goal is to, for \textit{every} node in the graph, count the number of outgoing edges of that node. Note that for nodes without any outgoing edges, their edge count would be zero; you need to output this as well.
+		You can assume that:
+		\begin{enumerate}
+			\item there are no duplicates or null values in the table; and
+			\item every node in the graph is involved in at least one edge.
+		\end{enumerate}
+		
+		\textbf{Solution: }
+		\begin{lstlisting}
+		SELECT n1, COUNT(n1)
+		FROM Graph
+		GROUP BY Graph.n1;
+		UNION
+		SELECT n2, 0
+		FROM Graph as g1
+		WHERE g1.n2 NOT IN (SELECT g2.n1
+		FROM Graph as g2     
+		);
+		\end{lstlisting}
+		
+		
+		\item Consider the following relation:\\
+		Trained(\underline{student}, master, year)\\
+		A tuple (S, M, Y) in Trained specifies that a SQL Master M trained student S who graduated in year Y. Your goal is to find \textit{the count of} SQL Masters who trained a student who graduated in the same year that 'Alice' or 'Bob' graduated.\\
+		\textbf{Solution: }
+		\begin{lstlisting}
+		SELECT COUNT(t1.master) as CountofMaster
+		FROM Trained as t1
+		WHERE t1.year IN ( SELECT t2.year
+		FROM Trained as t2
+		WHERE t2.student = "Alice" OR t2.student = "Bob"
+		)
+		GROUP BY t1.master;
+		\end{lstlisting}
+		
+		
+		\item Consider the following relation:\\
+		DBMS(\underline{operator}, system, performance)\\
+		A tuple (O, S, P) in DBMS specifies an operator O in system S and has the performance value P. Your goal is to find those systems whose operators achieves a higher performance value on average than the average performance value in a system named 'PostgreSQL'.\\
+		\textbf{Solution: }
+		\begin{lstlisting}
+		SELECT d3.system
+		FROM ( SELECT d1.system as system, AVG(d1.performance) as performance
+		FROM DBMS as d1
+		GROUP BY d1.system
+		) as d3
+		WHERE d3.performance > ( SELECT AVG(d2.performance)
+		FROM DBMS as d2
+		WHERE d2.system = "PostgreSQL"
+		);
+		\end{lstlisting}
+		
+		
+	\end{enumerate}
+	
+	
+	\section{Multi-Relation Queries (20 pts)}
+	Consider the following relations representing student information at UIUC:\\
+	Mentorship(\underline{mentee\_sid}, mentor\_sid)\\
+	Study(\underline{sid}, credits)\\
+	Enrollment(\underline{did}, \underline{sid})\\
+	Student(\underline{sid}, street , city)
+	
+	\begin{itemize}
+		\item A tuple (M1, M2) in Mentorship specifies that M2 is a mentor of another student M1. 
+		\item A tuple (S, C) in Study specifies that the student S has taken C credits.
+		\item A tuple in Enrollment (D, S) specifies that student S is enrolled in department D. 
+		\item A (ST, S, C) in Student specifies that student ST lives on street S in city C.
+	\end{itemize}
+	
+	\begin{enumerate}
+		\item Find all students who live in the same city and on the same street as their mentor.\\
+		\textbf{Solution: }
+		\begin{lstlisting}
+		SELECT m1.mentee_sid
+		FROM Mentorship as m1, Student as s1, Student as s2
+		WHERE m1.mentee_sid = s1.sid
+		AND m1.mentor_sid = s2.sid
+		AND s1.street = s2.street
+		AND s1.city = s2.city;
+		\end{lstlisting}
+		
+		
+		\item Find all students(i.e., distinct sid) who have taken more credits than the average credits of all of the students of their department.\\
+		\textbf{Solution: }
+		\begin{lstlisting}
+		SELECT s1.sid
+		FROM Study as s1
+		WHERE( s1.credits > ( SELECT AVG(s2.credits)
+		FROM Study as s2, Enrollment as e1, Enrollment as e2
+		WHERE s1.sid = e1.sid
+		AND s2.sid = e2.sid
+		AND e1.did = e2.did
+		));
+		\end{lstlisting}
+		
+		
+	\end{enumerate}
+	
+	
+	\section{Database Manipulation and Views (25 pts)}
+	
+	\begin{enumerate}
+		\item In the Study relation, insert a new student, whose id is 66666 and has 0 credits.\\
+		\textbf{Solution: }
+		\begin{lstlisting}
+		INSERT INTO Study
+		VALUES('66666', '0');
+		\end{lstlisting}
+		
+		\item In the Study relation, delete students who have graduated (i.e., the ones who have more than 200 credits).\\
+		\textbf{Solution: }
+		\begin{lstlisting}
+		DELETE FROM Study
+		WHERE Study.credits > 200;
+		\end{lstlisting}
+		
+		\item In the Study relation, add 2 credits for students who are mentors.\\
+		\textbf{Solution: }
+		\begin{lstlisting}
+		UPDATE Study
+		SET Study.credits = Study.credits + 2
+		WHERE Study.sid IN ( SELECT s1.sid
+		FROM Mentorship as m1, Study as s1
+		WHERE m1.mentor_sid = s1.sid
+		);
+		\end{lstlisting}
+		
+		\item Incoming students are those who have been accepted (i.e., exist in the \textbf{Student} relation) but have not registered in any department (i.e., do not exist in the \textbf{Enrollment} relation). Create a View that contains \textbf{sid} of all incoming students.\\
+		\textbf{Solution: }
+		\begin{lstlisting}
+		CREATE VIEW Incoming AS
+		SELECT s1.sid
+		FROM Student as s1
+		WHERE s1.sid NOT IN ( SELECT e1.sid
+		FROM Enrollment as e1
+		);
+		\end{lstlisting}
+		
+	\end{enumerate}
+	
+	
+	
+	\section{Constraints and Triggers (25 pts)}
+	\begin{enumerate}
+		\item Consider the following relation: \\
+		Payment(salary , bonus) \\
+		Write a schema-level assertion using the "CREATE ASSERTION" statement to ensure that no bonus is larger than the maximum salary in the \textbf{Payment} relation.\\
+		\textbf{Solution: }
+		\begin{lstlisting}
+		CREATE ASSERTION Bonus
+		CHECK(
+		NOT EXISTS( SELECT
+		FROM Payment 
+		WHERE Payment.bonus > MAX(Payment.salary)
+		));
+		\end{lstlisting}
+		
+		\item Consider the following relation: \\
+		Study(\underline{sid}, major , GPA) \\
+		Write a trigger T1 that increases the GPA by 10\% for those students who transform their major from any Non-CS major to 'CS'.\\
+		\textbf{Solution: }
+		\begin{lstlisting}
+		CREATE TRIGGER T1
+		AFTER UPDATE OF major ON Study
+		REFERENCING
+		OLD ROW AS old
+		NEW ROW AS new
+		FOR EACH ROW
+		WHEN(
+		old.major <> 'CS'
+		new.major = 'CS'
+		)
+		UPDATE Study
+		SET Study.GPA = Study.GPA * 1.1;
+		
+		
+		\end{lstlisting}
+		
+		
+		
+	\end{enumerate}
+	
+	
+	
+	
+	
+	%%% End document
 \end{document}
