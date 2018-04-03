@@ -117,13 +117,13 @@
 		A tuple (S, M, Y) in Trained specifies that a SQL Master M trained student S who graduated in year Y. Your goal is to find \textit{the count of} SQL Masters who trained a student who graduated in the same year that 'Alice' or 'Bob' graduated.\\
 		\textbf{Solution: }
 		\begin{lstlisting}
-		SELECT COUNT(t1.master) as CountofMaster
+		SELECT COUNT(DISTINCT t1.master) as CountofMaster
 		FROM Trained as t1
 		WHERE t1.year IN ( SELECT t2.year
 		FROM Trained as t2
-		WHERE t2.student = "Alice" OR t2.student = "Bob"
-		)
-		GROUP BY t1.master;
+		WHERE t2.student = "Alice" 
+		OR t2.student = "Bob"
+		);
 		\end{lstlisting}
 		
 		
@@ -178,13 +178,13 @@
 		\textbf{Solution: }
 		\begin{lstlisting}
 		SELECT s1.sid
-		FROM Study as s1
-		WHERE( s1.credits > ( SELECT AVG(s2.credits)
-		FROM Study as s2, Enrollment as e1, Enrollment as e2
-		WHERE s1.sid = e1.sid
-		AND s2.sid = e2.sid
+		FROM Study as s1, Enrollment as e1
+		WHERE e1.sid = s1.sid
+		AND s1.credits > ( SELECT AVG(s2.credits)
+		FROM Study as s2, Enrollment as e2
+		WHERE s2.sid = e2.sid
 		AND e1.did = e2.did
-		));
+		);
 		\end{lstlisting}
 		
 		
@@ -213,9 +213,8 @@
 		\begin{lstlisting}
 		UPDATE Study
 		SET Study.credits = Study.credits + 2
-		WHERE Study.sid IN ( SELECT s1.sid
-		FROM Mentorship as m1, Study as s1
-		WHERE m1.mentor_sid = s1.sid
+		WHERE Study.sid IN ( SELECT m1.mentor_sid
+		FROM Mentorship as m1
 		);
 		\end{lstlisting}
 		
@@ -243,7 +242,7 @@
 		\begin{lstlisting}
 		CREATE ASSERTION Bonus
 		CHECK(
-		NOT EXISTS( SELECT
+		NOT EXISTS( SELECT Payment.bonus
 		FROM Payment 
 		WHERE Payment.bonus > MAX(Payment.salary)
 		));
@@ -262,10 +261,10 @@
 		FOR EACH ROW
 		WHEN(
 		old.major <> 'CS'
-		new.major = 'CS'
+		AND new.major = 'CS'
 		)
 		UPDATE Study
-		SET Study.GPA = Study.GPA * 1.1;
+		SET new.GPA = old.GPA * 1.1;
 		
 		
 		\end{lstlisting}
