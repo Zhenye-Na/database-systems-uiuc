@@ -97,11 +97,11 @@
 		\begin{enumerate}
 			\item Suppose you construct a simple single level index, and that index is dense. How many index blocks are required to access all of the records of R?\\
 			\textbf{Solutions: }\\
-			If it is unclustered index, then we need $\ceil*{\frac{x}{z}}$ index blocks.\\
-			If it is clustered index, then we need $\ceil*{\frac{x}{number of keys in x records}}$ index blocks.\\
+			We need $\ceil*{\frac{x}{z}}$ index blocks.\\
 			
 			\item Suppose the index built is sparse. If the index stores a pointer to the lowest search key in each block, and the index is a simple single level index, how many data blocks do we need? How many index blocks do we need?\\
-			\textbf{Solutions: }We need $\ceil*{\frac{x}{yz}}$ index blocks.
+			\textbf{Solutions: }\\
+			We need $\ceil*{\frac{x}{yz}}$ index blocks and $\ceil*{\frac{x}{y}}$ data blocks.
 			
 		\end{enumerate}
 		
@@ -115,6 +115,9 @@
 	
 	
 	\section{B+ tree (30 pts)}
+	
+	\textbf{In this question, I kept the first two questions as the previous version and only changed the third question to the new version of question.}
+	
 	Consider a B+ tree of degree 2 shown below:
 	\[
 	\includegraphics[scale=0.5]{1.png}
@@ -150,7 +153,7 @@
 		\item Draw the extensible hash table which obeys the above constraints after the four keys are inserted.\\
 		\textbf{Solutions: }
 		First, we apply hash function to every key value.\\
-		25 -> 12 -> 1101 \\
+		25 -> 12 -> 1100 \\
 		13 -> 0 -> 0000 \\
 		23 -> 10 -> 1010 \\
 		21 -> 8 -> 1000 \\
@@ -161,6 +164,9 @@
 		
 		\item Using your solution to the previous question, now consider insertion of keys 18 and 20 into the hash table, and draw the resulting hash table.\\
 		\textbf{Solutions: }
+		First, we apply hash function to every key value.\\
+		18 -> 5 -> 0101 \\
+		20 -> 7 -> 0111 \\
 		\[
 		\includegraphics[scale=0.3]{7.png}
 		\]
