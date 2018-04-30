@@ -114,7 +114,7 @@
 			
 			\item Using your answer from A, what is the cost of joining R and S using the optimized block nested-loop join algorithm?\\
 			\textbf{Solutions: }\\
-			Cost = $\frac{B(R)B(S)}{M-2} + B(R) = \frac{50 \times 40}{8} + 50 = 300$
+			Cost = $\frac{B(R)B(S)}{M-2} + \min \{B(S) ,B(R)\} = \frac{50 \times 40}{8} + 40 = 290$
 			
 			\item What is the cost of joining R and S using a two pass hash-based join?\\
 			\textbf{Solutions: }\\
